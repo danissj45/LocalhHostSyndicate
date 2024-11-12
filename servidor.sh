@@ -48,20 +48,20 @@ iniciar_servidor() {
         pkg install python -y
     fi
 
-    # Crear un directorio para el servidor web (si no existe)
-    mkdir -p ~/web
+    # Crear un directorio para el servidor web dentro de LocalhHostSyndicate (si no existe)
+    mkdir -p ~/LocalhHostSyndicate/web
 
-    # Verificar si el archivo index.html existe
-    if [ ! -f ~/web/index.html ]; then
+    # Verificar si el archivo index.html existe en la nueva ruta
+    if [ ! -f ~/LocalhHostSyndicate/web/index.html ]; then
         echo -e "${GREEN}index.html no encontrado. Creando un archivo básico...\033[0m"
-        echo "<!DOCTYPE html><html><head><title>Mi Página Local</title></head><body><h1>Bienvenido a mi servidor local</h1></body></html>" > ~/web/index.html
+        echo "<!DOCTYPE html><html><head><title>Mi Página Local</title></head><body><h1>Bienvenido a mi servidor local</h1></body></html>" > ~/LocalhHostSyndicate/web/index.html
     fi
 
     # Selección de plantilla
     echo -e "${GREEN}Selecciona una plantilla de las siguientes:\033[0m"
-    select plantilla in $(ls ~/web); do
+    select plantilla in $(ls ~/LocalhHostSyndicate/web); do
         if [[ -n "$plantilla" ]]; then
-            cp ~/web/$plantilla ~/web/index.html
+            cp ~/LocalhHostSyndicate/web/$plantilla ~/LocalhHostSyndicate/web/index.html
             echo -e "${GREEN}Plantilla seleccionada: $plantilla\033[0m"
             break
         else
@@ -78,14 +78,14 @@ iniciar_servidor() {
     echo -e "${GREEN}Iniciando el servidor web en http://localhost:$puerto_libre\033[0m"
     
     # Iniciar el servidor web y guardar el PID del proceso
-    python3 -m http.server $puerto_libre --directory ~/web &
+    python3 -m http.server $puerto_libre --directory ~/LocalhHostSyndicate/web &
     echo $! > ~/servidor_pid.txt  # Guardamos el PID del servidor en un archivo
 }
 
 # Función para ver el contenido del directorio
 ver_contenido() {
-    echo -e "${GREEN}Contenido del directorio ~/web:\033[0m"
-    ls -l ~/web
+    echo -e "${GREEN}Contenido del directorio ~/LocalhHostSyndicate/web:\033[0m"
+    ls -l ~/LocalhHostSyndicate/web
 }
 
 # Función para ver puertos en uso sin necesidad de ser root
@@ -113,7 +113,7 @@ liberar_puertos() {
 instrucciones() {
     echo -e "${GREEN}Instrucciones de uso:\033[0m"
     echo "1. Iniciar servidor web: Selecciona esta opción para iniciar el servidor HTTP en el puerto deseado."
-    echo "2. Ver contenido del directorio ~/web: Muestra los archivos disponibles en la carpeta del servidor."
+    echo "2. Ver contenido del directorio ~/LocalhHostSyndicate/web: Muestra los archivos disponibles en la carpeta del servidor."
     echo "3. Ver puertos en uso: Muestra una lista de los puertos que están siendo utilizados en el sistema."
     echo "4. Liberar puertos: Permite liberar puertos ocupados por otros procesos."
     echo "5. Salir: Cierra el script."
@@ -126,7 +126,7 @@ mostrar_menu() {
     banner
     echo -e "${GREEN}==================== MENU ===================="
     echo "1. Iniciar servidor web"
-    echo "2. Ver contenido del directorio ~/web"
+    echo "2. Ver contenido del directorio ~/LocalhHostSyndicate/web"
     echo "3. Ver puertos en uso"
     echo "4. Liberar puerto"
     echo "5. Instrucciones"
