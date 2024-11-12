@@ -82,6 +82,18 @@ iniciar_servidor() {
     echo $! > ~/servidor_pid.txt  # Guardamos el PID del servidor en un archivo
 }
 
+# Función para detener el servicio
+detener_servicio() {
+    if [ -f ~/servidor_pid.txt ]; then
+        pid=$(cat ~/servidor_pid.txt)
+        kill $pid
+        echo -e "${GREEN}Servicio detenido correctamente.\033[0m"
+        rm ~/servidor_pid.txt  # Eliminar el archivo de PID
+    else
+        echo -e "${GREEN}No hay servicio en ejecución.\033[0m"
+    fi
+}
+
 # Función para ver el contenido del directorio
 ver_contenido() {
     echo -e "${GREEN}Contenido del directorio ~/LocalhHostSyndicate/web:\033[0m"
@@ -94,7 +106,7 @@ ver_puertos_en_uso() {
     ss -tuln
 }
 
-# Función para liberar puertos
+# Función para liberar puertos sin usar sudo
 liberar_puertos() {
     echo -e "${GREEN}Introduce el puerto que deseas liberar:\033[0m"
     read puerto
@@ -102,7 +114,8 @@ liberar_puertos() {
     if lsof -i :$puerto > /dev/null; then
         echo -e "${GREEN}Liberando el puerto $puerto...\033[0m"
         # Matar el proceso que está usando el puerto
-        sudo fuser -k $puerto/tcp
+        PID=$(lsof -t -i :$puerto)
+        kill $PID
         echo -e "${GREEN}Puerto $puerto liberado.\033[0m"
     else
         echo -e "${GREEN}El puerto $puerto no está en uso.\033[0m"
@@ -116,7 +129,8 @@ instrucciones() {
     echo "2. Ver contenido del directorio ~/LocalhHostSyndicate/web: Muestra los archivos disponibles en la carpeta del servidor."
     echo "3. Ver puertos en uso: Muestra una lista de los puertos que están siendo utilizados en el sistema."
     echo "4. Liberar puertos: Permite liberar puertos ocupados por otros procesos."
-    echo "5. Salir: Cierra el script."
+    echo "5. Detener el servicio: Detiene el servidor web que está en ejecución."
+    echo "6. Salir: Cierra el script."
     echo ""
 }
 
@@ -129,8 +143,9 @@ mostrar_menu() {
     echo "2. Ver contenido del directorio ~/LocalhHostSyndicate/web"
     echo "3. Ver puertos en uso"
     echo "4. Liberar puerto"
-    echo "5. Instrucciones"
-    echo "6. Salir"
+    echo "5. Detener servicio"
+    echo "6. Instrucciones"
+    echo "7. Salir"
     echo "==============================================="
     echo -e "${RESET}"  # Resetear color
 }
@@ -138,7 +153,7 @@ mostrar_menu() {
 # Bucle principal del menú
 while true; do
     mostrar_menu
-    read -p "Elige una opción (1-6): " opcion
+    read -p "Elige una opción (1-7): " opcion
 
     case $opcion in
         1)
@@ -158,15 +173,19 @@ while true; do
             read -p "Presiona Enter para continuar..."
             ;;
         5)
-            instrucciones
+            detener_servicio
             read -p "Presiona Enter para continuar..."
             ;;
         6)
+            instrucciones
+            read -p "Presiona Enter para continuar..."
+            ;;
+        7)
             echo -e "${GREEN}Saliendo...\033[0m"
             break
             ;;
         *)
-            echo -e "${GREEN}Opción inválida. Por favor, elige una opción entre 1 y 6.\033[0m"
+            echo -e "${GREEN}Opción inválida. Por favor, elige una opción entre 1 y 7.\033[0m"
             ;;
     esac
 done
